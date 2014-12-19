@@ -1,0 +1,28 @@
+{
+  "name": "fulcrum-ags-import",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/JasonSanford/fulcrum-ags-import.git"
+  },
+  "keywords": [
+    "fulcrum",
+    "arcgis"
+  ],
+  "author": "Jason Sanford",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JasonSanford/fulcrum-ags-import/issues"
+  },
+  "homepage": "https://github.com/JasonSanford/fulcrum-ags-import",
+  "dependencies": {
+    "request": "~2.51.0",
+    "fulcrum-app": "~0.7.0",
+    "lodash": "~2.4.1"
+  }
+}
