@@ -70,7 +70,7 @@ FormCreator.prototype.fulcrumFormCreateCallback = function (error, form) {
   if (error) {
     this.callback(error);
   } else {
-    console.log('Form created: ' + JSON.stringify(form));
+    this.callback(null, form);
   }
 };
 

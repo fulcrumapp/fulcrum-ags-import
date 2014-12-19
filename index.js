@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
-var request = require('request');
 var Fulcrum = require('fulcrum-app');
-var _ = require('lodash');
 
 var FormCreator = require('./form_creator');
 
@@ -22,7 +20,9 @@ var fulcrumClient = new Fulcrum({api_key: apiKey, url: 'http://localhost:3000/ap
 var fromCreatorCallback = function (error, form) {
   if (error) {
     console.log('Error creating form: ' + error);
+    return;
   }
+  console.log('Form created: ' + JSON.stringify(form));
 };
 var formCreator = new FormCreator(serviceUrl, fulcrumClient);
 
