@@ -4,6 +4,11 @@ var bind = function (fn, me) {
   };
 };
 
+var normalizeFieldKey = function (fieldKey) {
+  return fieldKey.toLowerCase();
+};
+
 module.exports = {
-  bind: bind
+  bind: bind,
+  normalizeFieldKey: normalizeFieldKey
 };

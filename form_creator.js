@@ -4,10 +4,6 @@ var _ = require('lodash');
 var fieldMappings = require('./field_mappings');
 var utils = require('./utils');
 
-function normalizeFieldKey(fieldKey) {
-  return fieldKey.toLowerCase();
-}
-
 function agsFieldsToElements (agsFields) {
   var fulcrumElements = [];
   var baseElement = {
@@ -19,8 +15,8 @@ function agsFieldsToElements (agsFields) {
   agsFields.forEach(function(agsField) {
     if (agsField.type in fieldMappings) {
       var element = _.merge({}, fieldMappings[agsField.type]);
-      element.key = normalizeFieldKey(agsField.name);
-      element.data_name = normalizeFieldKey(agsField.name);
+      element.key = utils.normalizeFieldKey(agsField.name);
+      element.data_name = utils.normalizeFieldKey(agsField.name);
       element.label = agsField.alias || agsField.name;
       fulcrumElements.push(_.merge(element, baseElement));
     } else {
@@ -59,7 +55,10 @@ FormCreator.prototype.agsServiceCallback = function (error, response, body) {
 
 FormCreator.prototype.getAgsService = function () {
   agsServiceRequestOptions = {
-    uri: this.serviceUrl + '?f=json',
+    uri: this.serviceUrl,
+    qs: {
+      f: 'json'
+    },
     json: true
   };
 
