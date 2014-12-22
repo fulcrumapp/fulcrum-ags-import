@@ -4,17 +4,10 @@ var _ = require('lodash');
 
 var utils = require('./utils');
 
-function normalizeAttribute (key, value) {
-  if (value === null) {
-    return null;
-  } else {
-    return value.toString();
-  }
-}
-
-function RecordImporter (form, serviceUrl, fulcrumClient) {
+function RecordImporter (form, serviceUrl, options, fulcrumClient) {
   this.form = form;
   this.serviceUrl = serviceUrl;
+  this.options = options;
   this.fulcrumClient = fulcrumClient;
   this.chunkSize = 50;
   this.parallelLimit = 20;
@@ -26,6 +19,27 @@ function RecordImporter (form, serviceUrl, fulcrumClient) {
 RecordImporter.prototype.import = function (callback) {
   this.callback = callback;
   this.getObjectIds();
+};
+
+RecordImporter.prototype.normalizeAttribute = function (key, value) {
+  var fieldType = this.form.agsFields[key];
+  if (value === null) {
+    return null;
+  } else {
+    if (fieldType === 'esriFieldTypeDate') {
+      var val = value;
+      try {
+        var date = new Date(value);
+        val = date.toISOString().split('T')[0];
+      } catch (e) {
+        console.log('Could not convert date: ' + value);
+        val = value;
+      }
+      return val.toString();
+    } else {
+      return value.toString();
+    }
+  }
 };
 
 RecordImporter.prototype.objectIdsCallback = function (error, response, body) {
@@ -49,8 +63,7 @@ RecordImporter.prototype.getObjectIds = function () {
     qs: {
       returnIdsOnly: 'true',
       f: 'json',
-      where: '1=1'
-      //where: 'OBJECTID<=600'
+      where: this.options.where || '1=1'
     },
     json: true
   };
@@ -124,9 +137,7 @@ RecordImporter.prototype.processChunksCallback = function (error, results) {
   if (error) {
     this.callback(error);
   } else {
-    //var count = _.reduce(results, function (memo, num) {return memo + num;}, 0);
-    //console.log('Chunks complete, count: ' + count);
-    console.log('Chunks complete: ' + results);
+    this.callback(null, results);
   }
 };
 
@@ -135,7 +146,11 @@ RecordImporter.prototype.agsFeatureToRecord = function (agsRecord) {
 
   for (var prop in agsRecord.attributes) {
     if (prop) {
-      form_values[utils.normalizeFieldKey(prop)] = normalizeAttribute(prop, agsRecord.attributes[prop]);
+      if (this.options.skip_fields && this.options.skip_fields.indexOf(prop) > -1) {
+
+      } else {
+        form_values[utils.normalizeFieldKey(prop)] = this.normalizeAttribute(prop, agsRecord.attributes[prop]);
+      }
     }
   }
 
