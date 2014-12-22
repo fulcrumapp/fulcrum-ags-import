@@ -59,10 +59,12 @@ FormCreator.prototype.fulcrumFormCreateCallback = function (error, form) {
 };
 
 FormCreator.prototype.createFulcrumForm = function (agsServiceData) {
+  var elements = this.agsFieldsToElements(agsServiceData.fields);
   var formPayload = {
     form: {
       name: agsServiceData.name,
-      elements: this.agsFieldsToElements(agsServiceData.fields)
+      record_title_key: elements[0].key,
+      elements: elements
     }
   };
 
