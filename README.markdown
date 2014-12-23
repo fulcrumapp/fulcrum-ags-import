@@ -10,6 +10,8 @@ Import an ArcGIS Server service layer into Fulcrum, creating both the form and a
 
     fulcrum-ags-import <map_service_layer_url> [options]
 
+You'll need to have your Fulcrum API key set in either a `FULCRUM_API_KEY` environment variable or passed as a parameter: `--api-key=abc123`
+
 A simple example that imports all features:
 
     fulcrum-ags-import http://gis-web.co.union.nc.us/arcgis/rest/services/PWGIS_Web/Operational_Layers/MapServer/5
