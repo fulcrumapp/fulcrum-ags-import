@@ -3,6 +3,8 @@ var request = require('request');
 var _ = require('lodash');
 
 var utils = require('./utils');
+var esriJsonToGeojson = require('./esrijson_to_geojson');
+var geojsonToPoint = require('./geojson_to_point');
 
 function RecordImporter (form, serviceUrl, options, fulcrumClient) {
   this.form = form;
@@ -144,6 +146,9 @@ RecordImporter.prototype.processChunksCallback = function (error, results) {
 RecordImporter.prototype.agsFeatureToRecord = function (agsRecord) {
   var form_values = {};
 
+  var geojson = esriJsonToGeojson(agsRecord.geometry);
+  var point = geojsonToPoint(geojson);
+
   for (var prop in agsRecord.attributes) {
     if (prop) {
       if (this.options.skip_fields && this.options.skip_fields.indexOf(prop) > -1) {
@@ -157,8 +162,8 @@ RecordImporter.prototype.agsFeatureToRecord = function (agsRecord) {
   var record = {
     record: {
       form_id: this.form.form.id,
-      latitude: agsRecord.geometry.y,
-      longitude: agsRecord.geometry.x,
+      latitude: point.coordinates[1],
+      longitude: point.coordinates[0],
       form_values: form_values
     }
   };
