@@ -30,7 +30,6 @@ if (!apiKey) {
   return;
 }
 
-//var fulcrumClient = new Fulcrum({api_key: apiKey, url: 'http://localhost:3000/api/v2/'});
 var fulcrumClient = new Fulcrum({api_key: apiKey});
 
 var fromCreatorCallback = function (error, form) {
