@@ -11,7 +11,7 @@ function RecordImporter (form, serviceUrl, options, fulcrumClient) {
   this.serviceUrl = serviceUrl;
   this.options = options;
   this.fulcrumClient = fulcrumClient;
-  this.chunkSize = 50;
+  this.chunkSize = options.chunkSize;
   this.parallelLimit = 20;
 
   this.objectIdsCallback = utils.bind(this.objectIdsCallback, this);

@@ -19,16 +19,20 @@ if (skip_fields) {
 }
 
 var where = argv.where;
-
-var options = {skip_fields: skip_fields, where: where};
-
 var serviceUrl = argv._[0];
 var apiKey = argv['api-key'] || process.env.FULCRUM_API_KEY;
+var chunkSize = argv['chunk-size'] || 50;
 
 if (!apiKey) {
   console.log('An API key must be present either as a \'--api-key\' argument or as a \'FULCRUM_API_KEY\' environment variable.');
   return;
 }
+
+var options = {
+  skip_fields: skip_fields,
+  where: where,
+  chunkSize: chunkSize
+};
 
 var fulcrumClient = new Fulcrum({api_key: apiKey});
 
