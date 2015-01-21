@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/JasonSanford/fulcrum-ags-import.git"
+    "url": "https://github.com/fulcrumapp/fulcrum-ags-import.git"
   },
   "keywords": [
     "fulcrum",
@@ -20,9 +20,9 @@
   "author": "Jason Sanford",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/JasonSanford/fulcrum-ags-import/issues"
+    "url": "https://github.com/fulcrumapp/fulcrum-ags-import/issues"
   },
-  "homepage": "https://github.com/JasonSanford/fulcrum-ags-import",
+  "homepage": "https://github.com/fulcrumapp/fulcrum-ags-import",
   "dependencies": {
     "request": "~2.51.0",
     "fulcrum-app": "~0.7.0",
