@@ -24,11 +24,12 @@
   },
   "homepage": "https://github.com/fulcrumapp/fulcrum-ags-import",
   "dependencies": {
-    "request": "~2.51.0",
+    "ags-stream": "^1.0.0",
+    "async": "~0.9.0",
     "fulcrum-app": "~0.7.0",
     "lodash": "~2.4.1",
-    "async": "~0.9.0",
     "minimist": "~1.1.0",
+    "request": "~2.51.0",
     "terraformer-arcgis-parser": "~1.0.4",
     "turf-point-on-surface": "~1.1.0"
   }
