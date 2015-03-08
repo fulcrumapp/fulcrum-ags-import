@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+var fs = require('fs');
+
 var minimist = require('minimist');
 var Fulcrum = require('fulcrum-app');
 
@@ -54,7 +56,16 @@ function importRecords (form) {
       console.log('Error importing records: ' + error);
       return;
     }
-    console.log('Records created: ' + JSON.stringify(results));
+    console.log('Import complete. Records created: ' + results.createdCount + '. Error count: ' + results.errorCount + '.');
+    if (results.errorCount) {
+      var logFileName = 'fulcrum-ags-import-errors.log';
+      var errors = [];
+      Object.keys(results.errors).forEach(function (key) {
+        errors.push(results.errors[key]);
+      });
+      fs.writeFileSync(logFileName, JSON.stringify(errors, null, 2));
+      console.log('Error log of failed records written to ' + logFileName + '.');
+    }
   };
   var recordImporter = new RecordImporter(form, serviceUrl, options, fulcrumClient);
   recordImporter.import(recordImporterCallback);

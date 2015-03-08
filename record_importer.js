@@ -1,26 +1,44 @@
+var crypto = require('crypto');
+
 var async = require('async');
-var request = require('request');
-var _ = require('lodash');
-var AgsStream = require('ags-stream')
+var AgsStream = require('ags-stream');
 
 var utils = require('./utils');
 var esriJsonToGeojson = require('./esrijson_to_geojson');
 var geojsonToPoint = require('./geojson_to_point');
 
+function hash (feature) {
+  return crypto.createHash('md5').update(JSON.stringify(feature)).digest('hex')
+}
+
 function RecordImporter (form, serviceUrl, options, fulcrumClient) {
   var me = this;
+
+  this.checkIfFinished = utils.bind(this.checkIfFinished, this);
 
   this.form = form;
   this.options = options;
   this.fulcrumClient = fulcrumClient;
-  this.chunkSize = options.chunkSize;
+  this.featureStatuses = {
+    not_processed: {},
+    complete: {},
+    error: {}
+  };
 
   this.agsStream = new AgsStream(serviceUrl, options);
 
   this.agsStream.on('data', function (data) {
-    data.forEach(function (feature) {
-      me.storeFeature(feature);
-    })
+    var tasks = data.map(function (feature) {
+      var featureHash = hash(feature);
+
+      me.featureStatuses.not_processed[featureHash] = feature;
+
+      return function (callback) {
+        me.storeFeature(feature, featureHash, callback);
+      };
+    });
+
+    async.series(tasks);
   });
 
   this.agsStream.on('error', function (error) {
@@ -28,7 +46,7 @@ function RecordImporter (form, serviceUrl, options, fulcrumClient) {
   });
 
   this.agsStream.on('end', function (data) {
-    me.callback(null);
+    me.monitorFinish();
   });
 }
 
@@ -58,15 +76,38 @@ RecordImporter.prototype.normalizeAttribute = function (key, value) {
   }
 };
 
-RecordImporter.prototype.storeFeature = function (feature) {
+RecordImporter.prototype.storeFeature = function (feature, featureHash, callback) {
   var me = this;
   var record = this.agsFeatureToRecord(feature);
 
   this.fulcrumClient.records.create(record, function (error, createdRecord) {
     if (error) {
-      me.callback(error);
+      me.featureStatuses.error[featureHash] = feature;
+    } else {
+      me.featureStatuses.complete[featureHash] = feature;
     }
+
+    delete me.featureStatuses.not_processed[featureHash];
+    callback(null);
   });
+};
+
+RecordImporter.prototype.monitorFinish = function () {
+  this.monitorFinishInterval = setInterval(this.checkIfFinished, 1000);
+};
+
+RecordImporter.prototype.checkIfFinished = function () {
+  var numberRemaining = Object.keys(this.featureStatuses.not_processed).length;
+
+  if (numberRemaining === 0) {
+    clearInterval(this.monitorFinishInterval);
+    var results = {
+      createdCount: Object.keys(this.featureStatuses.complete).length,
+      errorCount: Object.keys(this.featureStatuses.error).length,
+      errors: this.featureStatuses.error
+    };
+    this.callback(null, results);
+  }
 };
 
 RecordImporter.prototype.agsFeatureToRecord = function (agsRecord) {
